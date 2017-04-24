@@ -159,7 +159,7 @@ class ContentLoader {
 
             // sanitize title
             $title = $this->sanitizeField($item->getTitle());
-            if (strlen(trim($title)) == 0) {
+            if (strlen(trim($title)) === 0) {
                 $title = '[' . \F3::get('lang_no_title') . ']';
             }
 
@@ -230,7 +230,7 @@ class ContentLoader {
      * @return bool indicating filter success
      */
     protected function filter($source, $title, $content) {
-        if (strlen(trim($source['filter'])) != 0) {
+        if (strlen(trim($source['filter'])) !== 0) {
             $resultTitle = @preg_match($source['filter'], $title);
             $resultContent = @preg_match($source['filter'], $content);
             if ($resultTitle === false || $resultContent === false) {
@@ -239,7 +239,7 @@ class ContentLoader {
                 return true; // do not filter out item
             }
             // test filter
-            if ($resultTitle == 0 && $resultContent == 0) {
+            if ($resultTitle === 0 && $resultContent === 0) {
                 return false;
             }
         }
@@ -331,7 +331,7 @@ class ContentLoader {
     protected function fetchIcon($icon, $newItem, &$lasticon) {
         if (strlen(trim($icon)) > 0) {
             $extension = 'png';
-            if ($icon == $lasticon) {
+            if ($icon === $lasticon) {
                 \F3::get('logger')->debug('use last icon: ' . $lasticon);
                 $newItem['icon'] = md5($lasticon) . '.' . $extension;
             } else {
@@ -405,7 +405,7 @@ class ContentLoader {
     public function cleanup() {
         // cleanup orphaned and old items
         \F3::get('logger')->debug('cleanup orphaned and old items');
-        $this->itemsDao->cleanup(\F3::get('items_lifetime'));
+        $this->itemsDao->cleanup((int) \F3::get('items_lifetime'));
         \F3::get('logger')->debug('cleanup orphaned and old items finished');
 
         // delete orphaned thumbnails
@@ -434,12 +434,12 @@ class ContentLoader {
      */
     protected function cleanupFiles($type) {
         \F3::set('im', $this->itemsDao);
-        if ($type == 'thumbnails') {
+        if ($type === 'thumbnails') {
             $checker = function($file) {
                 return \F3::get('im')->hasThumbnail($file);
             };
             $itemPath = 'data/thumbnails/';
-        } elseif ($type == 'icons') {
+        } elseif ($type === 'icons') {
             $checker = function($file) {
                 return \F3::get('im')->hasIcon($file);
             };
@@ -447,7 +447,7 @@ class ContentLoader {
         }
 
         foreach (scandir($itemPath) as $file) {
-            if (is_file($itemPath . $file) && $file != '.htaccess') {
+            if (is_file($itemPath . $file) && $file !== '.htaccess') {
                 $inUsage = $checker($file);
                 if ($inUsage === false) {
                     unlink($itemPath . $file);
@@ -464,7 +464,7 @@ class ContentLoader {
      */
     protected function updateSource($source, $lastEntry) {
         // remove previous error
-        if (!is_null($source['error'])) {
+        if ($source['error'] !== null) {
             $this->sourceDao->error($source['id'], '');
         }
         // save last update
