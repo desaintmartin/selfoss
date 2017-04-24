@@ -233,7 +233,7 @@ class reddit2 extends \spouts\spout {
             if (preg_match('/embed$/i', $this->getHtmlUrl())) {
                 $response = $this->sendRequest($this->getHtmlUrl());
 
-                return '<a href="' . $this->getHtmlUrl() . '"><img src="' . preg_replace("/s\./", '.', $this->getImage($response->getBody())) . '"/></a>';
+                return '<a href="' . $this->getHtmlUrl() . '"><img src="' . preg_replace("/s\./", '.', \helpers\Image::findFirstImageSource($response->getBody())) . '"/></a>';
             }
             if ($this->scrape) {
                 if ($contentFromInstapaper = $this->fetchFromInstapaper($this->getHtmlUrl())) {
@@ -345,34 +345,8 @@ class reddit2 extends \spouts\spout {
     }
 
     /**
-     * taken from: http://zytzagoo.net/blog/2008/01/23/extracting-images-from-html-using-regular-expressions/
-     * Searches for the first occurence of an html <img> element in a string
-     * and extracts the src if it finds it. Returns boolean false in case an
-     * <img> element is not found.
+     * @param array $params
      *
-     * @param    string  $str    An HTML string
-     *
-     * @return   mixed           The contents of the src attribute in the
-     *                           found <img> or boolean false if no <img>
-     *                           is found
-     */
-    private function getImage($html) {
-        if (stripos($html, '<img') !== false) {
-            $imgsrc_regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
-            preg_match($imgsrc_regex, $html, $matches);
-            unset($imgsrc_regex);
-            unset($html);
-            if (is_array($matches) && !empty($matches)) {
-                return $matches[2];
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * @throws \GuzzleHttp\Exception\RequestException When an error is encountered
      * @throws \RuntimeException if the response body is not in JSON format
      * @throws \Exception if the credentials are invalid
